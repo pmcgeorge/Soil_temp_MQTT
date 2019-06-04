@@ -9,7 +9,7 @@ sensor2 = '28-0113167dbf61'# you need to add each sensor's address manually to t
 sensor1name = 'Left_temp'
 sensor2name = 'Right_temp'
 #MQTT Settings
-mqtt_server = "BROKER_IP"
+mqtt_server = "Broker_IP"
 mqtt_port = 1883
 mqtt_topic = "sensors/garden/Left_temp"
 mqtt_topic2 = "sensors/garden/Right_temp"
@@ -62,8 +62,15 @@ def read_temp2():
                 temp_f = temp_c * 9.0 / 5.0 + 32.0
                 return temp_f
 
+
+def on_connect(client, userdata, flags, rc):    
+    print("Result from connect: {}".format(
+            mqtt.connack_string(rc)))
+
+
 next_reading = time.time()
-client = mqtt.Client()
+client = mqtt.Client('gardenpi')
+client.on_connect = on_connect
 client.connect(mqtt_server,mqtt_port,60)
 
 client.loop_start()
@@ -79,8 +86,8 @@ try:
         #print (sensor2name+' = '+temp2)
 
         #This is the Publisher
+        
         #publish temp1
-
         client.publish(mqtt_topic, temp1);
         #needs a pause or it misses temp2
         time.sleep(.2)
@@ -90,9 +97,9 @@ try:
         sleep_time = next_reading-time.time()
         if sleep_time > 0:
             time.sleep(sleep_time)
-            
+
 except KeyboardInterrupt:
     pass
-    
+
 client.loop_stop()
-client.disconnect()        
+client.disconnect()
