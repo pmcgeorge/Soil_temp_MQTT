@@ -9,11 +9,11 @@ sensor2 = '28-0113167dbf61'# you need to add each sensor's address manually to t
 sensor1name = 'Left_temp'
 sensor2name = 'Right_temp'
 #MQTT Settings
-mqtt_server = "BROKERIP"
+mqtt_server = "BROKER_IP"
 mqtt_port = 1883
 mqtt_topic = "sensors/garden/Left_temp"
 mqtt_topic2 = "sensors/garden/Right_temp"
-Interval = 20
+Interval = 30
 
 
 base_dir1 = '/sys/bus/w1/devices/'
@@ -86,21 +86,15 @@ while not client.connected_flag: #wait in loop
 try:
     while True:
 
-        temp1 = str(read_temp1())
-        temp2 = str(read_temp2())
-
-        #print (sensor1name+' = '+temp1)
-        #time.sleep(.2)
-        #print (sensor2name+' = '+temp2)
-
         #This is the Publisher
         #publish temp1
 
-        client.publish(mqtt_topic, temp1);
+        client.publish(mqtt_topic, read_temp1());
         #needs a pause or it misses temp2
         time.sleep(.2)
+
         #publish temp2
-        client.publish(mqtt_topic2, temp2);
+        client.publish(mqtt_topic2, read_temp2());
         next_reading += Interval
         sleep_time = next_reading-time.time()
         if sleep_time > 0:
